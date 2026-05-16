@@ -9,7 +9,11 @@ export const getPriorityInbox = async (req: Request, res: Response): Promise<voi
   console.log(`[CONTROLLER] Priority inbox requested | Top ${n} notifications`);
 
   try {
-    const notifications = await fetchNotifications();
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : undefined;
+    const page = req.query.page ? parseInt(req.query.page as string, 10) : undefined;
+    const notification_type = req.query.notification_type as string;
+
+    const notifications = await fetchNotifications({ limit, page, notification_type });
 
     if (notifications.length === 0) {
       console.log("[CONTROLLER] No notifications found from API");
@@ -37,11 +41,15 @@ export const getPriorityInbox = async (req: Request, res: Response): Promise<voi
   }
 };
 
-export const getAllNotifications = async (_req: Request, res: Response): Promise<void> => {
+export const getAllNotifications = async (req: Request, res: Response): Promise<void> => {
   console.log("[CONTROLLER] All notifications requested");
 
   try {
-    const notifications = await fetchNotifications();
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : undefined;
+    const page = req.query.page ? parseInt(req.query.page as string, 10) : undefined;
+    const notification_type = req.query.notification_type as string;
+
+    const notifications = await fetchNotifications({ limit, page, notification_type });
     console.log(`[CONTROLLER] Returning all ${notifications.length} notifications`);
     res.status(200).json({ total: notifications.length, notifications });
   } catch (error: any) {

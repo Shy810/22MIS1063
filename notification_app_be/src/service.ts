@@ -3,11 +3,13 @@ import { config } from "./config";
 import { getValidToken, refreshToken } from "./auth";
 import { Notification, NotificationApiResponse } from "./types";
 
-export const fetchNotifications = async (): Promise<Notification[]> => {
+export const fetchNotifications = async (
+  params?: { limit?: number; page?: number; notification_type?: string }
+): Promise<Notification[]> => {
   const url = `${config.baseUrl}/notifications`;
   let token = await getValidToken();
 
-  console.log(`[SERVICE] Fetching notifications from: ${url}`);
+  console.log(`[SERVICE] Fetching notifications from: ${url} with params:`, params);
 
   try {
     const response = await axios.get<NotificationApiResponse>(url, {
@@ -15,6 +17,7 @@ export const fetchNotifications = async (): Promise<Notification[]> => {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
+      params,
     });
 
     const count = response.data.notifications?.length ?? 0;
@@ -31,6 +34,7 @@ export const fetchNotifications = async (): Promise<Notification[]> => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        params,
       });
 
       const count = retryResponse.data.notifications?.length ?? 0;
